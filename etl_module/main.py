@@ -69,7 +69,7 @@ def process_to_staging(conn, raw_data):
     result = conn.execute(stmt)
     conn.commit()
     print("Processed data to staging")
-    return raw_data
+    return staging_data
 
 # Process staging data to dimension and fact tables
 def process_to_dimension_fact():

@@ -16,15 +16,16 @@ class TestETL(unittest.TestCase):
 
     def setUp(self):
         # Set up any test data or state before each test
+        # TODO: These need to read from a file as testDataSet and resultDataSet
         self.raw_data = [
             {"client_id": 1, "data": json.dumps({"first_name": "John", "last_name": "Doe", "email": "johndoe@example.com", "phone": "123-456-7890", "created_at": "2023-01-15 08:30:00"})},
             {"client_id": 2, "data": json.dumps({"first_name": "Jane", "last_name": "Smith", "email": "janesmith@example.com", "phone": "234-567-8901", "created_at": "2023-01-16 09:00:00"})},
             {"client_id": 3, "data": json.dumps({"first_name": "Bob", "last_name": "Brown", "email": "bobbrown@example.com", "phone": "345-678-9012", "created_at": "2023-01-17 10:15:00"})}
         ]
-        self.expected_data = pd.DataFrame([
-            {"client_id": 1, "first_name": "John", "last_name": "Doe", "full_name": "John Doe"},
-            {"client_id": 2, "first_name": "Jane", "last_name": "Smith", "full_name": "Jane Smith"},
-            {"client_id": 3, "first_name": "Alice", "last_name": "Johnson", "full_name": "Alice Johnson"}
+        self.expected_staging_data = pd.DataFrame([
+            {"client_id": 1, "first_name": "John", "last_name": "Doe", "email": "johndoe@example.com", "phone": "123-456-7890", "created_at": "2023-01-15 08:30:00"},
+            {"client_id": 2, "first_name": "Jane", "last_name": "Smith", "email": "janesmith@example.com", "phone": "234-567-8901", "created_at": "2023-01-16 09:00:00"},
+            {"client_id": 3, "first_name": "Bob", "last_name": "Brown", "email": "bobbrown@example.com", "phone": "345-678-9012", "created_at": "2023-01-17 10:15:00"}
         ])
 
     def test_extract(self):
@@ -32,12 +33,12 @@ class TestETL(unittest.TestCase):
         df = load_raw_data("docs/test_client_data.csv")
         pd.testing.assert_frame_equal(df, pd.DataFrame(self.raw_data))
 
-    def test_transform(self):
+    def test_staging(self):
         # Test the transform function
         df = pd.DataFrame(self.raw_data)
         conn = Mock()
         transformed_df = process_to_staging(conn, df)
-        pd.testing.assert_frame_equal(transformed_df, self.expected_data)
+        pd.testing.assert_frame_equal(pd.DataFrame(transformed_df),self.expected_staging_data)
 
 if __name__ == '__main__':
     unittest.main()
