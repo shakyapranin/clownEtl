@@ -42,46 +42,6 @@ fact_data_table = Table('fact_data', metadata,
 # Create tables
 metadata.create_all(engine)
 
-# Raw table schema
-# def create_raw_table():
-#     with engine.connect() as conn:
-#         conn.execute(text("""
-#         CREATE TABLE IF NOT EXISTS raw_data (
-#             id INTEGER PRIMARY KEY AUTOINCREMENT,
-#             client_id TEXT,
-#             data TEXT
-#         )
-#         """))
-
-# Staging table schema
-# def create_staging_table():
-#     with engine.connect() as conn:
-#         conn.execute(text("""
-#         CREATE TABLE IF NOT EXISTS staging_data (
-#             id INTEGER PRIMARY KEY AUTOINCREMENT,
-#             client_id TEXT,
-#             processed_data TEXT
-#         )
-#         """))
-
-# Dimension and fact tables schema
-# def create_dimension_fact_tables():
-#     with engine.connect() as conn:
-#         conn.execute(text("""
-#         CREATE TABLE IF NOT EXISTS dim_client (
-#             client_id TEXT PRIMARY KEY,
-#             client_name TEXT
-#         )
-#         """))
-#         conn.execute(text("""
-#         CREATE TABLE IF NOT EXISTS fact_data (
-#             id INTEGER PRIMARY KEY AUTOINCREMENT,
-#             client_id TEXT,
-#             processed_data TEXT,
-#             FOREIGN KEY(client_id) REFERENCES dim_client(client_id)
-#         )
-#         """))
-
 # Load raw data
 def load_raw_data(file_path):
     data = pd.read_csv(file_path)
@@ -106,10 +66,9 @@ def process_to_staging():
                 'phone': data.get('phone'),
                 'created_at': data.get('created_at')
             })
-        
-        for data in staging_data:
-            stmt = insert(staging_table).values(**data)
-            conn.execute(stmt)
+        stmt = staging_table.insert().values(staging_data)
+        result = conn.execute(stmt)
+        conn.commit()
     print("Processed data to staging")
 
 # Process staging data to dimension and fact tables
