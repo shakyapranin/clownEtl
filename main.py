@@ -31,6 +31,7 @@ dim_client_table = Table('dim_client', metadata,
                          Column('client_id', Integer, primary_key=True),
                          Column('first_name', String),
                          Column('last_name', String),
+                         Column('full_name', String),
                          Column('email', String),
                          Column('phone', String))
 
@@ -76,9 +77,12 @@ def process_to_dimension_fact():
     with engine.connect() as conn:
         staging_data = pd.read_sql("SELECT * FROM staging_data", conn)
         clients = staging_data[['client_id']].drop_duplicates()
+        clients['full_name'] = staging_data['first_name'] + ' ' + staging_data['last_name']
+        clients['email'] = staging_data['email']
+        clients['phone'] = staging_data['phone']
         clients['client_name'] = clients['client_id'].apply(lambda x: f"Client {x}")  # Example transformation
-        clients.to_sql('dim_client', conn, if_exists='replace', index=False)
-        staging_data[['id', 'client_id', 'processed_data']].to_sql('fact_data', conn, if_exists='replace', index=False)
+        clients.to_sql('dim_client', engine, if_exists='replace', index=False)
+        staging_data[['id', 'client_id', 'created_at']].to_sql('fact_data', engine, if_exists='replace', index=False)
     print("Processed data to dimension and fact tables")
 
 # Watchdog event handler
@@ -87,14 +91,10 @@ class FileHandler(FileSystemEventHandler):
         if not event.is_directory and event.src_path.endswith(".csv"):
             load_raw_data(event.src_path)
             process_to_staging()
-            # process_to_dimension_fact()
+            process_to_dimension_fact()
 
 # Main ETL pipeline
 def main():
-    # create_raw_table()
-    # create_staging_table()
-    # create_dimension_fact_tables()
-    
     event_handler = FileHandler()
     observer = Observer()
     observer.schedule(event_handler, client_directory, recursive=False)
