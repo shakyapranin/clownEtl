@@ -48,29 +48,28 @@ def load_raw_data(file_path):
     data = pd.read_csv(file_path)
     data.to_sql('raw_data', engine, if_exists='append', index=False)
     print(f"Loaded raw data from {file_path}")
+    return data
 
 # Process raw data to staging
-def process_to_staging():
-    with engine.connect() as conn:
-        raw_data = pd.read_sql("SELECT * FROM raw_data", conn)
-        staging_data = []
-
-        for _, row in raw_data.iterrows():
-            row = dict(row)
-            client_id = row['client_id']
-            data = json.loads(row['data'])
-            staging_data.append({
-                'client_id': client_id,
-                'first_name': data.get('first_name'),
-                'last_name': data.get('last_name'),
-                'email': data.get('email'),
-                'phone': data.get('phone'),
-                'created_at': data.get('created_at')
-            })
-        stmt = staging_table.insert().values(staging_data)
-        result = conn.execute(stmt)
-        conn.commit()
+def process_to_staging(conn, raw_data):
+    staging_data = []
+    for _, row in raw_data.iterrows():
+        row = dict(row)
+        client_id = row['client_id']
+        data = json.loads(row['data'])
+        staging_data.append({
+            'client_id': client_id,
+            'first_name': data.get('first_name'),
+            'last_name': data.get('last_name'),
+            'email': data.get('email'),
+            'phone': data.get('phone'),
+            'created_at': data.get('created_at')
+        })
+    stmt = staging_table.insert().values(staging_data)
+    result = conn.execute(stmt)
+    conn.commit()
     print("Processed data to staging")
+    return staging_data
 
 # Process staging data to dimension and fact tables
 def process_to_dimension_fact():
@@ -90,7 +89,9 @@ class FileHandler(FileSystemEventHandler):
     def on_created(self, event):
         if not event.is_directory and event.src_path.endswith(".csv"):
             load_raw_data(event.src_path)
-            process_to_staging()
+            with engine.connect() as conn:
+                raw_data = pd.read_sql("SELECT * FROM raw_data", conn)
+                process_to_staging(conn, raw_data)
             process_to_dimension_fact()
 
 # Main ETL pipeline

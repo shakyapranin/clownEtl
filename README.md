@@ -1,6 +1,6 @@
 ## CLOWN ETL
 
-# This repository contains ETL Scripts to load files from a watched directory into raw tables, Transform then stage (to test scripts against) and once verified load into a production database.
+- This repository contains ETL Scripts to load files from a watched directory into raw tables, Transform then stage (to test scripts against) and once verified load into a production database.
 
 # Prerequisites
 
