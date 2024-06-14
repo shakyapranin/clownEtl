@@ -57,7 +57,10 @@ default_args = {
     start_date=datetime(2023, 1, 1),
     catchup=False,
 )
-def etl_pipeline():
+def etl_pipeline(): 
+    @task()
+    def setup():
+        metadata.create_all(engine)
 
     @task()
     def load_raw_data(file_path: str):
@@ -103,6 +106,7 @@ def etl_pipeline():
     file_path = './docs/client_data.csv'
     
     # Task execution order
+    setup()
     raw_data = load_raw_data(file_path)
     staging_data = process_to_staging()
     process_to_dimension_fact()

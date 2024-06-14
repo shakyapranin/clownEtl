@@ -7,3 +7,7 @@ docs
 logs
 airflow.db
 standalone_admin_password.txt
+
+
+# ignore remote development files
+.devcontainer

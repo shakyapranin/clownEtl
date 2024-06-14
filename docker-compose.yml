@@ -14,29 +14,23 @@ services:
     image: redis:6
 
   airflow-webserver:
-    build: .
+    build:
+      context: .docker/airflow
     container_name: airflow
-    image: apache/airflow
     depends_on:
       - postgres
       - redis
-    environment:
-      AIRFLOW__CORE__EXECUTOR: LocalExecutor
-      AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
-      AIRFLOW__CELERY__BROKER_URL: redis://redis:6379/0
     ports:
       - "8080:8080"
     expose:
       - "8080"
-    command: >
-      bash -c "
-        airflow db init &&
-        airflow users create --username admin --firstname Admin --lastname User --role Admin --email admin@example.com --password admin &&
-        airflow scheduler & airflow webserver
-      "
     volumes:
       - ./dags:/opt/airflow/dags
       - ./docs:/opt/airflow/docs
+    environment:
+      AIRFLOW__CORE__EXECUTOR: ${AIRFLOW__CORE__EXECUTOR}
+      AIRFLOW__CORE__SQL_ALCHEMY_CONN: ${AIRFLOW__CORE__SQL_ALCHEMY_CONN}
+      AIRFLOW__CELERY__BROKER_URL: ${AIRFLOW__CELERY__BROKER_URL}
 
 volumes:
   postgres_data:
