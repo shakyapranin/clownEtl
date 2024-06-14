@@ -212,3 +212,44 @@ File Path                          PID    Runtime      # DAGs    # Errors  Last 
 ---------------------------------  -----  ---------  --------  ----------  --------------  -------------------
 /opt/airflow/dags/etl_pipeline.py                           1           0  0.66s           2024-06-12T06:46:49
 ================================================================================
+[2024-06-14T11:25:07.659+0000] {manager.py:470} INFO - Processing files using up to 2 processes at a time 
+[2024-06-14T11:25:07.661+0000] {manager.py:471} INFO - Process each file at most once every 30 seconds
+[2024-06-14T11:25:07.663+0000] {manager.py:472} INFO - Checking for new files in /opt/airflow/dags every 300 seconds
+[2024-06-14T11:25:07.665+0000] {manager.py:737} INFO - Searching for files in /opt/airflow/dags
+[2024-06-14T11:25:07.677+0000] {manager.py:740} INFO - There are 2 files in /opt/airflow/dags
+[2024-06-14T11:25:07.840+0000] {manager.py:878} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                            PID  Runtime      # DAGs    # Errors  Last Runtime    Last Run
+---------------------------------  -----  ---------  --------  ----------  --------------  ----------
+/opt/airflow/dags/testEtl.py         177  0.07s             0           0
+/opt/airflow/dags/etl_pipeline.py    180  0.06s             0           0
+================================================================================
+[2024-06-14T11:25:38.586+0000] {manager.py:878} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                            PID  Runtime      # DAGs    # Errors  Last Runtime    Last Run
+---------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/etl_pipeline.py    191  0.01s             1           0  0.55s           2024-06-14T11:25:08
+/opt/airflow/dags/testEtl.py         188  0.07s             1           0  0.21s           2024-06-14T11:25:07
+================================================================================
+[2024-06-14T11:26:09.581+0000] {manager.py:878} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                            PID  Runtime      # DAGs    # Errors  Last Runtime    Last Run
+---------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/etl_pipeline.py                           1           0  1.67s           2024-06-14T11:25:40
+/opt/airflow/dags/testEtl.py         199  0.04s             1           0  0.57s           2024-06-14T11:25:39
+================================================================================
+[2024-06-14T11:26:40.065+0000] {manager.py:878} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                            PID  Runtime      # DAGs    # Errors  Last Runtime    Last Run
+---------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/etl_pipeline.py                           1           0  0.95s           2024-06-14T11:26:11
+/opt/airflow/dags/testEtl.py         210  0.05s             1           0  0.23s           2024-06-14T11:26:09
+================================================================================
