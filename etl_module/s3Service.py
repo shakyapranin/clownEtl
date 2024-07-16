@@ -14,7 +14,7 @@ def read_object(bucket_name: str, object_key: str):
             print(f"The object {object_key} does not exist in bucket {bucket_name}.")
         else:
             raise
-
+# s3.amazon.com/s3/objects/crown-health/hospital1/
 def read_all_objects(bucket_name: str) -> Generator[Any, Any, None]: 
     try:
         bucket = s3.Bucket(bucket_name)

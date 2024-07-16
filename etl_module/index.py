@@ -10,19 +10,24 @@ engine = create_engine('sqlite:///etl_pipeline.db')
 def start_etl():
     """
     For all clients
-    1. Iterate through the list of clients
-    2. Get url for client specific folder (identify the type of file)
-    3. Read flat files
+    1. Iterate through the list of clients, create an entry in etl_load table
+    2. Get url for client specific folder inside s3 (identify the type of file)
+    3. Read flat files (csv)
     4. (Skipped) Standardize the file naming
     5. Identify and classify as Account, financial, BillReference, Insurance
-    6. Create a new table in raw schema as client_name_fileType_date and load data
+    6. Create a new table in raw schema as client_name_fileType_date and load raw data (DUMP)
     7. Log actions into log table
     8. (Skipped) Check for staging data - Clear staging data if it already exists
-    9. Process the raw table with a view (Pre existing)
-    10. Process the raw table into dimensions and facts tables
+    9. Process the raw table with a view (Pre existing) and move files into error folder if errors occurs + create an entry in etl_load table
+    10. (TODO) Process the raw table into dimensions and facts tables
     11. Log the number of rows from file imported
     12. Log the number of rows that got into staging table
-    13. ASYNC Move the files into archive folder
+    13. ASYNC Move the files into archive folder, mark etl_load table is archived as true
+    OPS:
+    1. S3 access SDK - IAM Access for the instance
+    2. APScheduler?
+    3. Testing keys - AWS
+    4. Separate instance for APScheduler
     """
     # 1
     clients: list = [{id: 1, name: "Hospital 1"}, {id: 2, name: "Hospital 2"}] # Todo fetch the list of clients from database
@@ -33,17 +38,20 @@ def start_etl():
         # 3
         files = read_all_objects(client_bucket_name)
         for file in files:
+            
             # 5
             file_type = identify_file(file)
 
             # 6
-            time = int(time.time() * 1000) 
+            time = int(time.time() * 1000) # TODO: May be get this from file name itself to create a link
             client_name = client.name
             table_name = f"{client_name}_{file_type}_{int(time.time() * 1000)}"
             create_raw_table(table_name)
             data = pd.read_csv(file_path)
             num_rows = len(data)
             data.to_sql(table_name, engine, if_exists='append', index=False)
+
+            # TODO: RAW table transaction database entry ? ETL table?
 
             # 7 and 11
             create_log(f"Created raw table: {table_name} and imported with {num_rows} rows.")
@@ -69,6 +77,7 @@ def start_etl():
             connection.commit()
 
             #13
+            # TODO: Processed files to be marked as processed
             dispatcher("archive_file", meta: { bucket_name: {client_bucket_name}, destination_path: f"/archive/{time}/" , source_path: file.path })
 
 
