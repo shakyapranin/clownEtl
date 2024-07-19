@@ -106,9 +106,9 @@ def etl_pipeline():
     file_path = './docs/client_data.csv'
     
     # Task execution order
-    setup()
-    raw_data = load_raw_data(file_path)
-    staging_data = process_to_staging()
-    process_to_dimension_fact()
+    setup() >> load_raw_data(file_path) >> process_to_staging() >> process_to_dimension_fact()
+    # raw_data = load_raw_data(file_path)
+    # staging_data = process_to_staging()
+    # process_to_dimension_fact()
 
 etl_dag = etl_pipeline()

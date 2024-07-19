@@ -1,5 +1,5 @@
 # Use the official Apache Airflow image
-FROM apache/airflow
+FROM apache/airflow:2.1.0
 
 # Set environment variables
 # ENV AIRFLOW__CORE__EXECUTOR=LocalExecutor
